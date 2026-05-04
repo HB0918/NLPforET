@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+
+<style>
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f7f7f7;
+    color: #333;
+    padding: 40px;
+}
+
+.page { display: none; }
+.active { display: block; }
+
+/* progress */
+.progress-container {
+    margin-bottom: 20px;
+}
+.progress-bar {
+    height: 10px;
+    background: #ddd;
+    border-radius: 5px;
+}
+.progress {
+    height: 10px;
+    background: #4CAF50;
+    border-radius: 5px;
+}
+
+/* word */
+.word {
+    color: #1a73e8;
+    font-weight: bold;
+    cursor: pointer;
+    position: relative;
+}
+.word:hover {
+    background: #fff3a0;
+}
+
+/* tooltip */
+.tooltip {
+    visibility: hidden;
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 6px;
+    width: 250px;
+    top: 25px;
+    z-index: 10;
+}
+
+/* button */
+button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    border: none;
+    background: #1a73e8;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+}
+button:hover {
+    background: #1558b0;
+}
+
+select {
+    padding: 5px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="progress-container">
+  <div id="stepText">Step 1 / 4</div>
+  <div class="progress-bar">
+    <div class="progress" id="progress" style="width:25%"></div>
+  </div>
+</div>
+
+<!-- PAGE 1 -->
+<div class="page active" id="page1">
+<h2>Step 1: English Definitions</h2>
+<div id="content1"></div>
+<button onclick="nextPage(2)">Next</button>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page" id="page2">
+<h2>Step 2: Synonyms</h2>
+<div id="content2"></div>
+<button onclick="nextPage(3)">Next</button>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page" id="page3">
+<h2>Step 3: Korean Meaning</h2>
+<div id="content3"></div>
+<button onclick="nextPage(4)">Next</button>
+</div>
+
+<!-- PAGE 4 -->
+<div class="page" id="page4">
+<h2>Final Quiz</h2>
+<div id="quiz"></div>
+<button onclick="checkAnswers()">Check</button>
+<button onclick="reviewWrong()">Review Wrong</button>
+<p id="result"></p>
+</div>
+
+<script>
+const baseText = `
+<p>
+Work-life balance is an important concept that has been gaining more and more attention in recent years.
+It refers to the ability to maintain a healthy relationship between work and personal life, allowing both to coexist harmoniously without one {1} the other.
+</p>
+
+<p>
+Achieving this balance requires {2} and self-control, as well as the ability to {3} our priorities on a regular basis.
+</p>
+
+<p>
+This means carving out {4} for activities that help us relax, such as social {5}.
+</p>
+
+<p>
+Another important aspect is {6} a routine. However, it is also essential to be flexible when they {7}.
+</p>
+
+<p>
+This can lead to burnout, leaving us feeling {8}.
+</p>
+`;
+
+const words = ["infringing on","discipline","reassess","“me” time","gathering","sticking to","pop up","worn out"];
+
+const definitions = [
+"to limit someone's right or freedom to do something",
+"the practice of training people to obey rules",
+"to consider something again",
+"time spent alone",
+"an event or activity at which people come together",
+"to remain loyal to a particular opinion",
+"to appear or happen suddenly",
+"to feel very tired"
+];
+
+const synonyms = ["violating","regulation","re-evaluate","personal time.","meeting","holding to","come up","exhausted"];
+
+const korean = ["~을 침해하다","규율","재평가하다","나를 위한 휴식 시간","모임","~을 (바꾸지 않고) 고수하다","갑자기 일어나다","매우 지친"];
+
+function buildText(tooltips){
+    let text = baseText;
+    for(let i=0;i<8;i++){
+        let html = `<span class="word" onclick="toggleTip(this)">
+        ${words[i]}<span class="tooltip">${tooltips[i]}</span></span>`;
+        text = text.replace("{"+(i+1)+"}", html);
+    }
+    return text;
+}
+
+document.getElementById("content1").innerHTML = buildText(definitions);
+document.getElementById("content2").innerHTML = buildText(synonyms);
+document.getElementById("content3").innerHTML = buildText(korean);
+
+// tooltip click toggle
+function toggleTip(el){
+    let tip = el.querySelector(".tooltip");
+    tip.style.visibility = (tip.style.visibility === "visible") ? "hidden" : "visible";
+}
+
+// navigation
+function nextPage(n){
+    let pages = document.getElementsByClassName("page");
+    for(let p of pages) p.classList.remove("active");
+    document.getElementById("page"+n).classList.add("active");
+
+    document.getElementById("stepText").innerText = "Step "+n+" / 4";
+    document.getElementById("progress").style.width = (n*25)+"%";
+}
+
+// quiz
+let meanings = korean;
+let shuffled = [...meanings].sort(()=>Math.random()-0.5);
+let wrongList = [];
+
+let quizHTML = "";
+for(let i=0;i<words.length;i++){
+    quizHTML += `${words[i]} →
+    <select id="q${i}">
+    <option value="">선택</option>
+    ${shuffled.map(m=>`<option>${m}</option>`).join("")}
+    </select><br><br>`;
+}
+document.getElementById("quiz").innerHTML = quizHTML;
+
+function checkAnswers(){
+    let score = 0;
+    wrongList = [];
+
+    for(let i=0;i<words.length;i++){
+        let sel = document.getElementById("q"+i);
+        if(sel.value === meanings[i]){
+            score++;
+            sel.style.border = "2px solid green";
+        } else {
+            sel.style.border = "2px solid red";
+            wrongList.push(i);
+        }
+    }
+
+    document.getElementById("result").innerText = "Score: "+score+"/8";
+}
+
+// 🔥 복습 기능
+function reviewWrong(){
+    if(wrongList.length === 0){
+        alert("틀린 문제가 없습니다!");
+        return;
+    }
+
+    function buildReview(tooltips){
+        let text = baseText;
+
+        for(let i=0;i<words.length;i++){
+            if(wrongList.includes(i)){
+                let html = `<span class="word" onclick="toggleTip(this)">
+                ${words[i]}<span class="tooltip">${tooltips[i]}</span></span>`;
+                text = text.replace("{"+(i+1)+"}", html);
+            } else {
+                text = text.replace("{"+(i+1)+"}", words[i]);
+            }
+        }
+        return text;
+    }
+
+    // 🔥 Step 1,2,3 모두 다시 생성
+    document.getElementById("content1").innerHTML = buildReview(definitions);
+    document.getElementById("content2").innerHTML = buildReview(synonyms);
+    document.getElementById("content3").innerHTML = buildReview(korean);
+
+    nextPage(1);
+}
+</script>
+
+</body>
+</html>
