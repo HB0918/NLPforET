@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Vocabulary with Glossing</title>
+<style>
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f7f7f7;
+    color: #333;
+    padding: 40px;
+    max-width: 1050px;
+    margin: auto;
+}
+h1 { color:#1a73e8; }
+.tab-buttons {
+    margin-bottom: 20px;
+}
+.tab-btn {
+    padding: 10px 18px;
+    border: none;
+    background: #1a73e8;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 6px;
+}
+.tab-btn:hover { background:#1558b0; }
+.section { display:none; }
+.section.active { display:block; }
+.page { display:none; }
+.page.active { display:block; }
+.progress-container { margin-bottom: 20px; }
+.progress-bar {
+    height: 10px;
+    background: #ddd;
+    border-radius: 5px;
+}
+.progress {
+    height: 10px;
+    background: #4CAF50;
+    border-radius: 5px;
+    width: 0%;
+}
+.word {
+    color: #1a73e8;
+    font-weight: bold;
+    cursor: pointer;
+    position: relative;
+}
+.word:hover { background:#fff3a0; }
+.tooltip {
+    visibility: hidden;
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 7px;
+    width: 280px;
+    top: 25px;
+    left: 0;
+    z-index: 10;
+    border-radius: 5px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.12);
+}
+button {
+    margin-top: 18px;
+    padding: 10px 18px;
+    border: none;
+    background: #1a73e8;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+}
+button:hover { background:#1558b0; }
+button.danger { background:#c62828; }
+button.danger:hover { background:#8e0000; }
+input, select {
+    padding: 7px;
+    margin: 4px 0;
+}
+.card {
+    background:white;
+    padding:15px;
+    border-radius:8px;
+    margin:12px 0;
+    box-shadow:0 0 4px rgba(0,0,0,.08);
+}
+.result-box {
+    background:white;
+    padding:18px;
+    border-radius:10px;
+    margin-top:14px;
+    box-shadow:0 0 4px rgba(0,0,0,.08);
+}
+table {
+    width:100%;
+    border-collapse: collapse;
+    background:white;
+    margin-top:12px;
+}
+th, td {
+    border:1px solid #ddd;
+    padding:10px;
+    text-align:center;
+}
+th { background:#eef3ff; }
+.small-note {
+    color:#666;
+    font-size:13px;
+}
+</style>
+</head>
+<body>
+
+<h1>Vocabulary with Glossing</h1>
+
+<div class="tab-buttons">
+    <button class="tab-btn" onclick="showTab('groupA')">Group A</button>
+    <button class="tab-btn" onclick="showTab('groupB')">Group B</button>
+    <button class="tab-btn" onclick="showTab('delayed')">Delayed Test</button>
+    <button class="tab-btn" onclick="showTab('admin')">Admin Dashboard</button>
+</div>
+
+<!-- GROUP A -->
+<div id="groupA" class="section active">
+    <div class="progress-container">
+        <div id="aStepText">Group A - Ready</div>
+        <div class="progress-bar"><div class="progress" id="aProgress"></div></div>
+    </div>
+
+    <div id="aStart" class="page active">
+        <h2>Group A</h2>
+        <p>Participant ID:</p>
+        <input type="text" id="aID" placeholder="e.g., A01">
+        <br>
+        <button onclick="startA()">Start Learning</button>
+    </div>
+
+    <div id="aLearn" class="page">
+        <h2>Learning: Korean Gloss</h2>
+        <div id="aText"></div>
+        <button onclick="goAQuiz()">Go to Quiz</button>
+    </div>
+
+    <div id="aQuiz" class="page">
+        <h2>Final Quiz</h2>
+        <div id="aQuizBox"></div>
+        <button onclick="submitA()">Submit</button>
+    </div>
+
+    <div id="aResult" class="page">
+        <h2>Result</h2>
+        <div class="result-box" id="aResultBox"></div>
+        <button onclick="resetA()">Start New Participant</button>
+    </div>
+</div>
+
+<!-- GROUP B -->
+<div id="groupB" class="section">
+    <div class="progress-container">
+        <div id="bStepText">Group B - Ready</div>
+        <div class="progress-bar"><div class="progress" id="bProgress"></div></div>
+    </div>
+
+    <div id="bStart" class="page active">
+        <h2>Group B</h2>
+        <p>Participant ID:</p>
+        <input type="text" id="bID" placeholder="e.g., B01">
+        <br>
+        <button onclick="startB()">Start Learning</button>
+    </div>
+
+    <div id="b1" class="page"><h2>Step 1: Additional Context</h2><div id="bContent1"></div><button onclick="nextB(2)">Next</button></div>
+    <div id="b2" class="page"><h2>Step 2: English Definitions</h2><div id="bContent2"></div><button onclick="nextB(3)">Next</button></div>
+    <div id="b3" class="page"><h2>Step 3: Synonyms</h2><div id="bContent3"></div><button onclick="nextB(4)">Next</button></div>
+    <div id="b4" class="page"><h2>Step 4: Korean Meanings</h2><div id="bContent4"></div><button onclick="goBQuiz()">Go to Quiz</button></div>
+
+    <div id="bQuiz" class="page">
+        <h2>Final Quiz</h2>
+        <div id="bQuizBox"></div>
+        <button onclick="submitB()">Submit</button>
+    </div>
+
+    <div id="bResult" class="page">
+        <h2>Result</h2>
+        <div class="result-box" id="bResultBox"></div>
+        <button onclick="resetB()">Start New Participant</button>
+    </div>
+</div>
+
+<!-- DELAYED TEST -->
+<div id="delayed" class="section">
+    <div class="progress-container">
+        <div id="dStepText">Delayed Test - Ready</div>
+        <div class="progress-bar"><div class="progress" id="dProgress"></div></div>
+    </div>
+
+    <div id="dStart" class="page active">
+        <h2>Delayed Test</h2>
+        <p>Participant ID:</p>
+        <input type="text" id="dID" placeholder="e.g., A01">
+        <p>Group:</p>
+        <select id="dGroup">
+            <option value="A">Group A</option>
+            <option value="B">Group B</option>
+        </select>
+        <br>
+        <button onclick="startDelayed()">Start Test</button>
+    </div>
+
+    <div id="dQuiz" class="page">
+        <h2>Delayed Vocabulary Test</h2>
+        <div id="dQuizBox"></div>
+        <button onclick="submitDelayed()">Submit</button>
+    </div>
+
+    <div id="dResult" class="page">
+        <h2>Delayed Test Result</h2>
+        <div class="result-box" id="dResultBox"></div>
+        <button onclick="resetDelayed()">Start New Participant</button>
+    </div>
+</div>
+
+<!-- ADMIN -->
+<div id="admin" class="section">
+    <h2>Admin Dashboard</h2>
+    <p class="small-note">Statistics are automatically updated when this tab is opened. The same Participant ID + Group is treated as the same person.</p>
+
+    <h3>Learning Results</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Group</th>
+                <th>Participants</th>
+                <th>Average Score</th>
+                <th>Average Total Study Time (min)</th>
+                <th>Average Efficiency</th>
+            </tr>
+        </thead>
+        <tbody id="learningStats"></tbody>
+    </table>
+
+    <h3>Delayed Test Results</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Group</th>
+                <th>Participants</th>
+                <th>Average Delayed Score</th>
+            </tr>
+        </thead>
+        <tbody id="delayedStats"></tbody>
+    </table>
+
+    <button onclick="exportCSV()">Export CSV</button>
+    <button class="danger" onclick="clearAllData()">Clear All Data</button>
+</div>
+
+<script>
+const baseText = `
+<p>Many people struggle to manage their daily responsibilities effectively.</p>
+<p>To stay productive and healthy, it is important to develop {1} and regularly {2} personal goals and schedules.</p>
+<p>Setting aside {3} can help reduce stress and improve overall well-being.</p>
+<p>Spending time with friends through a small {4} is one way to enjoy this personal time.</p>
+<p>At the same time, people should be prepared to adjust their plans when unexpected situations {5}.</p>
+`;
+
+const words = ["discipline", "reassess", '"me" time', "gathering", "pop up"];
+
+const korean = [
+    "규율, 자기통제",
+    "재평가하다",
+    "나만의 시간",
+    "모임",
+    "갑자기 발생하다"
+];
+
+const contexts = [
+    "Successful athletes need discipline to follow strict training schedules every day.",
+    "After receiving feedback, she decided to reassess her original plan.",
+    "Busy parents often struggle to find enough “me” time during the week.",
+    "Our family gathering is held every year during the holidays.",
+    "Unexpected technical issues can pop up during an online presentation."
+];
+
+const definitions = [
+    "the ability to control yourself and follow rules",
+    "to think about something again in order to make a new judgment",
+    "time spent doing things for yourself",
+    "an event where people come together",
+    "to appear or happen unexpectedly"
+];
+
+const synonyms = [
+    "self-control",
+    "reconsider",
+    "personal time",
+    "meeting",
+    "occur suddenly"
+];
+
+const quizOptions = [
+    ["규율, 자기통제", "동기부여", "집중력", "책임감"],
+    ["계획하다", "비교하다", "재평가하다", "결정하다"],
+    ["업무 시간", "가족과 보내는 시간", "취침 시간", "나만의 시간"],
+    ["모임", "축제", "여행", "공연"],
+    ["천천히 진행되다", "반복되다", "갑자기 발생하다", "사라지다"]
+];
+
+let aStartTime = null;
+let bStartTime = null;
+let dStartTime = null;
+
+function showTab(id){
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    if(id === 'admin') updateAdmin();
+}
+
+function showOnly(containerId, pageId){
+    const container = document.getElementById(containerId);
+    container.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
+}
+
+function toggleTip(el){
+    const tip = el.querySelector('.tooltip');
+    tip.style.visibility = (tip.style.visibility === 'visible') ? 'hidden' : 'visible';
+}
+
+function buildText(tooltips){
+    let text = baseText;
+    for(let i=0; i<5; i++){
+        let html = `<span class="word" onclick="toggleTip(this)">${words[i]}<span class="tooltip">${tooltips[i]}</span></span>`;
+        text = text.replace("{"+(i+1)+"}", html);
+    }
+    return text;
+}
+
+function buildPlainText(){
+    let text = baseText;
+    for(let i=0; i<5; i++){
+        text = text.replace("{"+(i+1)+"}", `<b>${words[i]}</b>`);
+    }
+    return text;
+}
+
+function buildQuiz(targetId, prefix){
+    let html = "";
+    for(let i=0; i<5; i++){
+        html += `<div class="card"><b>${words[i]}</b><br><br><select id="${prefix}${i}">`;
+        html += `<option value="">선택</option>`;
+        quizOptions[i].forEach(opt => html += `<option>${opt}</option>`);
+        html += `</select></div>`;
+    }
+    document.getElementById(targetId).innerHTML = html;
+}
+
+function grade(prefix){
+    let score = 0;
+    for(let i=0; i<5; i++){
+        let sel = document.getElementById(prefix+i);
+        if(sel.value === korean[i]){
+            score++;
+            sel.style.border = "2px solid green";
+        } else {
+            sel.style.border = "2px solid red";
+        }
+    }
+    return score;
+}
+
+
+function getWrongFeedback(prefix){
+    let feedback = "";
+    for(let i=0; i<5; i++){
+        let sel = document.getElementById(prefix+i);
+        if(sel.value !== korean[i]){
+            feedback += `<div class="card" style="border-left:5px solid #c62828;">
+                <b>${words[i]}</b><br>
+                Your answer: ${sel.value || "No answer"}<br>
+                Correct answer: ${korean[i]}
+            </div>`;
+        }
+    }
+    if(feedback === ""){
+        return `<div class="card" style="border-left:5px solid #4CAF50;">
+            Great job! You got all answers correct.
+        </div>`;
+    }
+    return `<h3>Review Your Mistakes</h3>${feedback}`;
+}
+
+function getRecords(){
+    return JSON.parse(localStorage.getItem("vocabGlossingRecords") || "[]");
+}
+
+function saveRecords(records){
+    localStorage.setItem("vocabGlossingRecords", JSON.stringify(records));
+}
+
+// Same Participant ID + Group = same person.
+// Learning result updates the same person's learning record instead of adding duplicates.
+function upsertLearningRecord(record){
+    let records = getRecords();
+    let existing = records.find(r => r.id === record.id && r.group === record.group);
+    if(existing){
+        existing.studyTime = record.studyTime;
+        existing.score = record.score;
+        existing.efficiency = record.efficiency;
+    } else {
+        records.push(record);
+    }
+    saveRecords(records);
+}
+
+// Delayed score updates the same person's existing record.
+// If no learning record exists, it creates a delayed-only record.
+function upsertDelayedRecord(id, group, delayedScore){
+    let records = getRecords();
+    let existing = records.find(r => r.id === id && r.group === group);
+    if(existing){
+        existing.delayedScore = delayedScore;
+    } else {
+        records.push({id:id, group:group, delayedScore: delayedScore});
+    }
+    saveRecords(records);
+}
+
+/* GROUP A */
+function startA(){
+    if(!document.getElementById('aID').value.trim()){
+        alert("Please enter Participant ID.");
+        return;
+    }
+    aStartTime = new Date();
+    document.getElementById('aText').innerHTML = buildText(korean);
+    buildQuiz('aQuizBox', 'aQ');
+    showOnly('groupA', 'aLearn');
+    document.getElementById('aStepText').innerText = "Group A - Learning";
+    document.getElementById('aProgress').style.width = "33%";
+}
+
+function goAQuiz(){
+    showOnly('groupA', 'aQuiz');
+    document.getElementById('aStepText').innerText = "Group A - Quiz";
+    document.getElementById('aProgress').style.width = "66%";
+}
+
+function submitA(){
+    const score = grade('aQ');
+    const mins = ((new Date() - aStartTime)/1000/60).toFixed(2);
+    const eff = (score / Math.max(parseFloat(mins), 0.1)).toFixed(2);
+    const id = document.getElementById('aID').value.trim();
+
+    upsertLearningRecord({
+        id: id,
+        group: "A",
+        studyTime: parseFloat(mins),
+        score: score,
+        efficiency: parseFloat(eff)
+    });
+
+    document.getElementById('aResultBox').innerHTML =
+        `<b>Participant ID:</b> ${id}<br>
+         <b>Group:</b> A<br>
+         <b>Score:</b> ${score}/5<br>
+         <b>Total Study Time:</b> ${mins} min<br>
+         <b>Efficiency:</b> ${eff}
+         ${getWrongFeedback('aQ')}`;
+
+    showOnly('groupA', 'aResult');
+    document.getElementById('aStepText').innerText = "Group A - Result";
+    document.getElementById('aProgress').style.width = "100%";
+}
+
+function resetA(){
+    document.getElementById('aID').value = "";
+    document.getElementById('aQuizBox').innerHTML = "";
+    document.getElementById('aResultBox').innerHTML = "";
+    showOnly('groupA', 'aStart');
+    document.getElementById('aStepText').innerText = "Group A - Ready";
+    document.getElementById('aProgress').style.width = "0%";
+}
+
+/* GROUP B */
+function startB(){
+    if(!document.getElementById('bID').value.trim()){
+        alert("Please enter Participant ID.");
+        return;
+    }
+    bStartTime = new Date();
+    document.getElementById('bContent1').innerHTML = buildText(contexts);
+    document.getElementById('bContent2').innerHTML = buildText(definitions);
+    document.getElementById('bContent3').innerHTML = buildText(synonyms);
+    document.getElementById('bContent4').innerHTML = buildText(korean);
+    buildQuiz('bQuizBox', 'bQ');
+    showOnly('groupB', 'b1');
+    document.getElementById('bStepText').innerText = "Group B - Step 1 / 5";
+    document.getElementById('bProgress').style.width = "20%";
+}
+
+function nextB(n){
+    showOnly('groupB', 'b'+n);
+    document.getElementById('bStepText').innerText = "Group B - Step " + n + " / 5";
+    document.getElementById('bProgress').style.width = (n*20) + "%";
+}
+
+function goBQuiz(){
+    showOnly('groupB', 'bQuiz');
+    document.getElementById('bStepText').innerText = "Group B - Step 5 / 5";
+    document.getElementById('bProgress').style.width = "100%";
+}
+
+function submitB(){
+    const score = grade('bQ');
+    const mins = ((new Date() - bStartTime)/1000/60).toFixed(2);
+    const eff = (score / Math.max(parseFloat(mins), 0.1)).toFixed(2);
+    const id = document.getElementById('bID').value.trim();
+
+    upsertLearningRecord({
+        id: id,
+        group: "B",
+        studyTime: parseFloat(mins),
+        score: score,
+        efficiency: parseFloat(eff)
+    });
+
+    document.getElementById('bResultBox').innerHTML =
+        `<b>Participant ID:</b> ${id}<br>
+         <b>Group:</b> B<br>
+         <b>Score:</b> ${score}/5<br>
+         <b>Total Study Time:</b> ${mins} min<br>
+         <b>Efficiency:</b> ${eff}
+         ${getWrongFeedback('bQ')}`;
+
+    showOnly('groupB', 'bResult');
+    document.getElementById('bStepText').innerText = "Group B - Result";
+    document.getElementById('bProgress').style.width = "100%";
+}
+
+function resetB(){
+    document.getElementById('bID').value = "";
+    document.getElementById('bQuizBox').innerHTML = "";
+    document.getElementById('bResultBox').innerHTML = "";
+    showOnly('groupB', 'bStart');
+    document.getElementById('bStepText').innerText = "Group B - Ready";
+    document.getElementById('bProgress').style.width = "0%";
+}
+
+/* DELAYED */
+function startDelayed(){
+    if(!document.getElementById('dID').value.trim()){
+        alert("Please enter Participant ID.");
+        return;
+    }
+    dStartTime = new Date();
+    buildQuiz('dQuizBox', 'dQ');
+    showOnly('delayed', 'dQuiz');
+    document.getElementById('dStepText').innerText = "Delayed Test - Quiz";
+    document.getElementById('dProgress').style.width = "50%";
+}
+
+function submitDelayed(){
+    const score = grade('dQ');
+    const id = document.getElementById('dID').value.trim();
+    const group = document.getElementById('dGroup').value;
+
+    upsertDelayedRecord(id, group, score);
+
+    document.getElementById('dResultBox').innerHTML =
+        `<b>Participant ID:</b> ${id}<br>
+         <b>Group:</b> ${group}<br>
+         <b>Delayed Score:</b> ${score}/5
+         ${getWrongFeedback('dQ')}`;
+
+    showOnly('delayed', 'dResult');
+    document.getElementById('dStepText').innerText = "Delayed Test - Result";
+    document.getElementById('dProgress').style.width = "100%";
+}
+
+function resetDelayed(){
+    document.getElementById('dID').value = "";
+    document.getElementById('dGroup').selectedIndex = 0;
+    document.getElementById('dQuizBox').innerHTML = "";
+    document.getElementById('dResultBox').innerHTML = "";
+    showOnly('delayed', 'dStart');
+    document.getElementById('dStepText').innerText = "Delayed Test - Ready";
+    document.getElementById('dProgress').style.width = "0%";
+}
+
+/* ADMIN */
+function mean(arr, key){
+    const vals = arr.map(x => Number(x[key])).filter(x => !isNaN(x));
+    if(vals.length === 0) return "-";
+    return (vals.reduce((a,b)=>a+b,0) / vals.length).toFixed(2);
+}
+
+function updateAdmin(){
+    const records = getRecords();
+    const A = records.filter(r => r.group === "A" && r.score !== undefined);
+    const B = records.filter(r => r.group === "B" && r.score !== undefined);
+    const Ad = records.filter(r => r.group === "A" && r.delayedScore !== undefined);
+    const Bd = records.filter(r => r.group === "B" && r.delayedScore !== undefined);
+
+    document.getElementById('learningStats').innerHTML = `
+        <tr>
+            <td>Group A</td>
+            <td>${A.length}</td>
+            <td>${mean(A,'score')}</td>
+            <td>${mean(A,'studyTime')} min</td>
+            <td>${mean(A,'efficiency')}</td>
+        </tr>
+        <tr>
+            <td>Group B</td>
+            <td>${B.length}</td>
+            <td>${mean(B,'score')}</td>
+            <td>${mean(B,'studyTime')} min</td>
+            <td>${mean(B,'efficiency')}</td>
+        </tr>
+    `;
+
+    document.getElementById('delayedStats').innerHTML = `
+        <tr>
+            <td>Group A</td>
+            <td>${Ad.length}</td>
+            <td>${mean(Ad,'delayedScore')}</td>
+        </tr>
+        <tr>
+            <td>Group B</td>
+            <td>${Bd.length}</td>
+            <td>${mean(Bd,'delayedScore')}</td>
+        </tr>
+    `;
+}
+
+function exportCSV(){
+    const records = getRecords();
+    let csv = "ParticipantID,Group,StudyTime,Score,Efficiency,DelayedScore\n";
+    records.forEach(r => {
+        csv += `${r.id || ""},${r.group || ""},${r.studyTime ?? ""},${r.score ?? ""},${r.efficiency ?? ""},${r.delayedScore ?? ""}\n`;
+    });
+    const blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "vocabulary_with_glossing_results.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function clearAllData(){
+    if(confirm("Are you sure you want to delete all saved data?")){
+        localStorage.removeItem("vocabGlossingRecords");
+        updateAdmin();
+        alert("All data has been cleared.");
+    }
+}
+</script>
+
+</body>
+</html>
